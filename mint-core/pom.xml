@@ -15,4 +15,12 @@
 
     <name>mint-core</name>
     <description>Core engine for Mint snapshot testing</description>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
 </project>
