@@ -21,6 +21,7 @@
 
     <modules>
         <module>mint-core</module>
+        <module>mint-junit5</module>
     </modules>
 
     <dependencyManagement>
