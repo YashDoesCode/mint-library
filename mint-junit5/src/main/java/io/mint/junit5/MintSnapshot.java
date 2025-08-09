@@ -1,5 +1,6 @@
 package io.mint.junit5;
 
+import io.mint.core.MintConfig;
 import io.mint.core.Snapshot;
 import io.mint.core.SnapshotComparator;
 import io.mint.core.SnapshotSerializer;
@@ -44,16 +45,17 @@ public final class MintSnapshot {
      * exists yet, this method writes the serialized actual output as the baseline snapshot and
      * returns successfully without failure. On subsequent runs, it compares the serialized actual
      * output against the stored snapshot, throwing an {@link AssertionError} with line-by-line diffs
-     * if any mismatch is detected.
+     * if any mismatch is detected. If {@link MintConfig#UPDATE} is enabled, existing snapshots
+     * are automatically overwritten with new values.
      *
      * @param actual the actual object to serialize and assert against baseline snapshot
-     * @throws AssertionError if a snapshot exists and does not match actual output
+     * @throws AssertionError if a snapshot exists, update mode is false, and output mismatches
      */
     public void assertMatches(Object actual) {
         String content = serializer.serialize(actual);
         Snapshot actualSnapshot = new Snapshot(testName, content);
         Snapshot expected = store.load(testName);
-        if (expected == null) {
+        if (expected == null || MintConfig.UPDATE) {
             store.save(actualSnapshot);
             return;
         }

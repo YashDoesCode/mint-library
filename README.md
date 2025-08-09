@@ -8,6 +8,14 @@ Compare expected and actual outputs effortlessly across unit and integration tes
 
 <!-- TODO: Add build and release badges -->
 
+## Updating snapshots
+
+When intentional changes occur, update existing snapshots locally using:
+```bash
+mvn test -Dmint.update=true
+```
+In CI environments, never set `MINT_UPDATE` to ensure baseline snapshots are strictly validated.
+
 ## License
 
 Licensed under the [MIT License](LICENSE).
