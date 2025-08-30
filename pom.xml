@@ -23,6 +23,7 @@
     <modules>
         <module>mint-core</module>
         <module>mint-junit5</module>
+        <module>mint-example</module>
     </modules>
 
     <dependencyManagement>
