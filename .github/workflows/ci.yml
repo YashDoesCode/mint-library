@@ -1,0 +1,43 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    name: Build & Verify (Java ${{ matrix.java-version }})
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        java-version: [ 17, 21 ]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up JDK ${{ matrix.java-version }}
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: ${{ matrix.java-version }}
+          cache: 'maven'
+
+      - name: Guard against MINT_UPDATE in CI
+        run: |
+          if [ -n "$MINT_UPDATE" ]; then
+            echo "ERROR: MINT_UPDATE environment variable must not be set in CI workflows"
+            exit 1
+          fi
+
+      - name: Run Maven build and tests
+        run: mvn -B -ntp verify
+
+      - name: Upload Surefire Test Reports on Failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: surefire-reports-jdk-${{ matrix.java-version }}
+          path: '**/target/surefire-reports/'
