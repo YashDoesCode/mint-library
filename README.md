@@ -8,18 +8,39 @@ Compare expected and actual outputs effortlessly across unit and integration tes
 
 <!-- TODO: Add build and release badges -->
 
-## Quick start
+## Installation
 
-Add `mint-junit5` to your test dependencies:
+### Gradle
+```groovy
+repositories {
+    maven { url 'https://jitpack.io' }
+}
 
+dependencies {
+    testImplementation 'com.github.YashDoesCode.mint-library:mint-junit5:v0.1.0'
+}
+```
+
+### Maven
 ```xml
+<repositories>
+    <repository>
+        <id>jitpack.io</id>
+        <url>https://jitpack.io</url>
+    </repository>
+</repositories>
+
 <dependency>
-    <groupId>io.github.yashdoescodemint</groupId>
+    <groupId>com.github.YashDoesCode.mint-library</groupId>
     <artifactId>mint-junit5</artifactId>
-    <version>0.1.0-SNAPSHOT</version>
+    <version>v0.1.0</version>
     <scope>test</scope>
 </dependency>
 ```
+
+## Quick start
+
+Add `mint-junit5` to your test dependencies:
 
 Annotate your test class with `@EnableMintSnapshots` and inject `MintSnapshot`:
 
