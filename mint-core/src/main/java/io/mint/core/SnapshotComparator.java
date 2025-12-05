@@ -28,6 +28,7 @@ public final class SnapshotComparator {
      * @param expected the expected baseline snapshot
      * @param actual   the actual received snapshot
      * @return a {@link DiffResult} containing comparison outcome and diff
+     * @throws NullPointerException if {@code expected} or {@code actual} is null
      */
     public DiffResult compare(Snapshot expected, Snapshot actual) {
         Objects.requireNonNull(expected, "expected snapshot must not be null");
