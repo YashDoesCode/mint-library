@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.0] - 2025-12-05
+
+### Added
+- Stable production release with strict thread-safe and deterministic contracts.
+- Verified zero mandatory runtime dependencies in `mint-core`.
+- Automated POSIX file security permissions and path traversal defense.
+- `MintConfig` update mode support via `-Dmint.update=true` or `MINT_UPDATE=true`.
+
 ## [0.1.0] - 2025-10-11
 
 ### Added
