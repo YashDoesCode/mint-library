@@ -11,6 +11,7 @@
 > A micro-library for asserting complex system outputs in Java
 
 [![CI](https://github.com/YashDoesCode/mint-library/actions/workflows/ci.yml/badge.svg)](https://github.com/YashDoesCode/mint-library/actions/workflows/ci.yml)
+[![Version](https://img.shields.io/badge/version-1.0.0-green.svg)](https://github.com/YashDoesCode/mint-library/releases/tag/v1.0.0)
 [![JitPack](https://jitpack.io/v/YashDoesCode/mint-library.svg)](https://jitpack.io/#YashDoesCode/mint-library)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
@@ -26,7 +27,7 @@
 <dependency>
     <groupId>com.github.YashDoesCode.mint-library</groupId>
     <artifactId>mint-junit5</artifactId>
-    <version>v0.1.0</version>
+    <version>v1.0.0</version>
     <scope>test</scope>
 </dependency>
 ```
@@ -65,6 +66,12 @@ Never enable update flags in CI.
 ## Security notes
 
 Mint applies path normalization, restricted POSIX permissions, and atomic moves to ensure safety. See [SECURITY.md](SECURITY.md) for our threat model.
+
+## Release Notes (v1.0.0)
+
+- **What shipped:** Production release of the Mint snapshot testing library. Includes `mint-core` engine, thread-safe `SnapshotSerializer` SPI, atomic `SnapshotStore` with POSIX permissions and TOCTOU protection, `MintConfig` update mode, optional Jackson JSON serialization, and full JUnit 5 `@EnableMintSnapshots` parameter resolver integration.
+- **Breaking changes:** None.
+- **Migration notes:** None.
 
 ## Roadmap
 
