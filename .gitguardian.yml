@@ -1,0 +1,9 @@
+version: 2
+secret:
+  ignored-paths:
+    - "**/src/test/resources/**"
+    - "**/src/test/java/**"
+  ignored-matches:
+    - match: "Password123!"
+    - match: "fake-access-token"
+    - match: "test-secret"

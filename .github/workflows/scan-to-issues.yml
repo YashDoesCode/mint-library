@@ -1,0 +1,43 @@
+name: Scan Findings to GitHub Issues
+
+on:
+  workflow_run:
+    workflows: ["Security Scanning"]
+    types: [completed]
+
+permissions:
+  issues: write
+  contents: read
+
+jobs:
+  create-issues:
+    runs-on: ubuntu-24.04
+    if: ${{ github.event.workflow_run.conclusion == 'success' || github.event.workflow_run.conclusion == 'failure' }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download DeepSource results
+        uses: actions/download-artifact@v4
+        with:
+          name: deepsource-results
+          path: ./scan-results
+          run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+        continue-on-error: true
+      - name: Create issues from findings
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if [ ! -f ./scan-results/deepsource-issues.json ]; then
+            echo "No findings file. Skipping."
+            exit 0
+          fi
+          jq -c '.issues[]?' ./scan-results/deepsource-issues.json | while IFS= read -r issue; do
+            TITLE=$(echo "$issue" | jq -r '.title // .checker_name // "unknown finding"')
+            BODY=$(echo "$issue" | jq -r '.description // .message // "no description"')
+            FILE=$(echo "$issue" | jq -r '.location.path // "unknown"')
+            LINE=$(echo "$issue" | jq -r '.location.line // 0')
+            gh issue create \
+              --title "sec: $TITLE" \
+              --body "$(printf '## Finding\n**File:** `%s:%s`\n**Description:** %s\n\n## Action Required\n- [ ] Review and confirm true/false positive\n- [ ] If true positive, fix without leaving code comments\n- [ ] Re-run scanner to confirm resolution\n- [ ] Close issue when all three scanners are clean\n' "$FILE" "$LINE" "$BODY")" \
+              --label "security,automated" || true
+          done

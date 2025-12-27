@@ -1,0 +1,51 @@
+name: Security Scanning
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+  security-events: write
+  issues: write
+
+jobs:
+  gitguardian:
+    name: GitGuardian Secret Scan
+    runs-on: ubuntu-24.04
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: GitGuardian Shield
+        uses: GitGuardian/ggshield-action@v1.43.0
+        env:
+          GITGUARDIAN_API_KEY: ${{ secrets.GITGUARDIAN_API_KEY }}
+
+  deepsource:
+    name: DeepSource Analysis
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: maven
+      - name: Build for analysis
+        run: mvn -B -ntp compile
+      - name: DeepSource CLI - fetch issues
+        env:
+          DEEPSOURCE_DSN: ${{ secrets.DEEPSOURCE_DSN }}
+        run: |
+          curl -sfL https://cli.deepsource.com/install | sh
+          ./bin/deepsource issues --output json > deepsource-issues.json || true
+      - name: Upload scan results
+        uses: actions/upload-artifact@v4
+        with:
+          name: deepsource-results
+          path: deepsource-issues.json
+          if-no-files-found: ignore

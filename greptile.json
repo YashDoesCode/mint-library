@@ -1,0 +1,10 @@
+{
+  "rules": [
+    "Enforce immutable value objects — all public classes must be final",
+    "No java.io.File usage — java.nio.file only",
+    "All String I/O must use StandardCharsets.UTF_8 explicitly",
+    "No System.out or System.err in main code",
+    "Every public method must have Javadoc with @param, @return, @throws"
+  ],
+  "skip_draft_prs": true
+}

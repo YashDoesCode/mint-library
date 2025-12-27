@@ -1,0 +1,16 @@
+version = 1
+
+[[analyzers]]
+name = "java"
+enabled = true
+
+  [analyzers.meta]
+  runtime_version = "17"
+
+[[analyzers]]
+name = "secrets"
+enabled = true
+
+[[transformers]]
+name = "google-java-format"
+enabled = true
