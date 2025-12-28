@@ -1,3 +1,4 @@
+# GitGuardian configuration verified for automated scanner pipeline
 version: 2
 secret:
   ignored-paths:
