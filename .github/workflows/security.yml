@@ -42,10 +42,10 @@ jobs:
           DEEPSOURCE_DSN: ${{ secrets.DEEPSOURCE_DSN }}
         run: |
           curl -sfL https://cli.deepsource.com/install | sh
-          ./bin/deepsource issues --output json > deepsource-issues.json || true
+          ./bin/deepsource issues --output json > deepsource-issues.json
       - name: Upload scan results
         uses: actions/upload-artifact@v4
         with:
           name: deepsource-results
           path: deepsource-issues.json
-          if-no-files-found: ignore
+          if-no-files-found: error

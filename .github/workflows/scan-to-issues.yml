@@ -22,7 +22,6 @@ jobs:
           path: ./scan-results
           run-id: ${{ github.event.workflow_run.id }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
-        continue-on-error: true
       - name: Create issues from findings
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
