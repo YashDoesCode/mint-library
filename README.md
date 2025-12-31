@@ -62,6 +62,10 @@ Never enable update flags in CI.
   ```java
   mint.with(new JsonSnapshotSerializer()).assertMatches(userObject);
   ```
+- **XmlSnapshotSerializer**: Deterministic XML serialization using built-in JDK `java.xml`:
+  ```java
+  mint.with(new XmlSnapshotSerializer()).assertMatches(userObject);
+  ```
 
 ## Security notes
 
