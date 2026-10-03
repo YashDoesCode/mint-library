@@ -25,6 +25,6 @@ Mint is designed with defensive patterns to prevent common security vulnerabilit
 If you discover a security vulnerability in Mint, please report it responsibly:
 
 1. **Do not** file a public GitHub issue.
-2. Email security findings to the maintainer at `yash@users.noreply.github.com`.
+2. Email security findings to the maintainer at `dev.theyashsrivastava07+github@gmail.com`.
 3. Include detailed reproduction steps and affected version numbers.
 4. Maintainers will acknowledge reports within 48 hours and coordinate a security fix.
