@@ -106,6 +106,16 @@ class SnapshotStoreTest {
     }
 
     @Test
+    void testMalformedUtf8ThrowsSnapshotException() throws IOException {
+        SnapshotStore store = new SnapshotStore(tempDir);
+        Path snapFile = tempDir.resolve("malformed.snap");
+        // Write invalid UTF-8 byte sequence (0xFF, 0xFE are invalid UTF-8 start bytes)
+        Files.write(snapFile, new byte[]{(byte) 0xFF, (byte) 0xFE, 0x00});
+
+        assertThrows(SnapshotException.class, () -> store.load("malformed"));
+    }
+
+    @Test
     void testAtomicOverwrite() {
         SnapshotStore store = new SnapshotStore(tempDir);
         Snapshot v1 = new Snapshot("config", "version=1");

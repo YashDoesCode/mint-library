@@ -2,6 +2,10 @@ package io.mint.core;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.ByteBuffer;
+import java.nio.charset.CharacterCodingException;
+import java.nio.charset.CharsetDecoder;
+import java.nio.charset.CodingErrorAction;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.AtomicMoveNotSupportedException;
 import java.nio.file.Files;
@@ -61,13 +65,19 @@ public final class SnapshotStore {
             if (!attrs.isRegularFile()) {
                 throw new SnapshotException("Snapshot path is not a regular file: " + path);
             }
-            String content;
+            byte[] bytes;
             try (InputStream in = Files.newInputStream(path, LinkOption.NOFOLLOW_LINKS)) {
-                content = new String(in.readAllBytes(), StandardCharsets.UTF_8);
+                bytes = in.readAllBytes();
             }
+            CharsetDecoder decoder = StandardCharsets.UTF_8.newDecoder()
+                    .onMalformedInput(CodingErrorAction.REPORT)
+                    .onUnmappableCharacter(CodingErrorAction.REPORT);
+            String content = decoder.decode(ByteBuffer.wrap(bytes)).toString();
             return new Snapshot(name, content);
         } catch (NoSuchFileException e) {
             return null;
+        } catch (CharacterCodingException e) {
+            throw new SnapshotException("Malformed UTF-8 sequence in snapshot file: " + path, e);
         } catch (IOException e) {
             throw new SnapshotException("Failed to read snapshot file: " + path, e);
         }
@@ -96,7 +106,7 @@ public final class SnapshotStore {
             try {
                 Files.move(tempFile, targetPath, StandardCopyOption.ATOMIC_MOVE, StandardCopyOption.REPLACE_EXISTING);
             } catch (AtomicMoveNotSupportedException e) {
-                Files.move(tempFile, targetPath, StandardCopyOption.REPLACE_EXISTING);
+                throw new SnapshotException("Atomic snapshot replacement is not supported on filesystem: " + targetPath, e);
             }
         } catch (IOException e) {
             if (tempFile != null) {
