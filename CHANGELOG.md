@@ -8,7 +8,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
-- `XmlSnapshotSerializer` using JDK built-in `java.xml` with deterministic formatting and zero external dependencies.
+- `XmlSnapshotSerializer` decoupled from `java.desktop` and `java.beans`, featuring deterministic property sorting, native Java 17 record support, POJO reflection, and circular reference guards.
+- JUnit 5 test isolation in `MintExtension` for `@ParameterizedTest`, `@RepeatedTest`, and `@Nested` test suites.
+- `MintSnapshot.named(String)` method allowing multiple independent snapshot assertions within a single test method.
+- Automatic line ending normalization (`\r\n` and `\r` to `\n`) in `SnapshotComparator` for cross-platform test stability on Windows checkouts.
+- Configurable `maxDiffs` threshold in `SnapshotComparator` with readable truncation diagnostics for large diffs.
+- Contributor pull request template (`.github/PULL_REQUEST_TEMPLATE.md`).
+- Automated Gitleaks secret detection workflow in GitHub Actions.
+
+### Fixed
+- Hardened `SnapshotStore` path validation to strictly reject names containing directory separators (`/`, `\`), null bytes (`\0`), or blank strings.
+- Closed symlink redirection and TOCTOU race window during snapshot loading via `NOFOLLOW_LINKS` streams.
+- Enforced strict UTF-8 charset decoding in `SnapshotStore` with `CodingErrorAction.REPORT` instead of silent character substitution.
+- Configured Maven Surefire plugin management to automatically discover and execute integration test suites matching `**/*IT.java`.
+- Corrected DeepSource CLI execution path in CI workflow.
+
+### Security
+- Enforced atomic replacement semantics with clear failure propagation via `SnapshotException` when unsupported by the filesystem.
+- Hardened XML parsing and transformation against XXE, external general/parameter entities, and external DTD access.
 
 ## [1.0.0] - 2025-12-05
 
