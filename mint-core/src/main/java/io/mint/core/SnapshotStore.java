@@ -1,12 +1,15 @@
 package io.mint.core;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.AtomicMoveNotSupportedException;
 import java.nio.file.Files;
+import java.nio.file.LinkOption;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.FileAttribute;
 import java.nio.file.attribute.PosixFilePermission;
 import java.nio.file.attribute.PosixFilePermissions;
@@ -45,16 +48,23 @@ public final class SnapshotStore {
      *
      * @param name the snapshot name
      * @return the loaded {@link Snapshot}, or {@code null} if no snapshot file exists
-     * @throws SnapshotException if an I/O error occurs, the snapshot name is invalid, or symlink escapes
+     * @throws SnapshotException if an I/O error occurs, the snapshot name is invalid, or a symlink is encountered
      */
     public Snapshot load(String name) {
         Objects.requireNonNull(name, "Snapshot name must not be null");
         Path path = resolvePath(name);
         try {
-            if (Files.isSymbolicLink(path)) {
-                verifySymlinkContainment(path);
+            BasicFileAttributes attrs = Files.readAttributes(path, BasicFileAttributes.class, LinkOption.NOFOLLOW_LINKS);
+            if (attrs.isSymbolicLink()) {
+                throw new SnapshotException("Symbolic links are not permitted in snapshot storage: " + path);
             }
-            String content = Files.readString(path, StandardCharsets.UTF_8);
+            if (!attrs.isRegularFile()) {
+                throw new SnapshotException("Snapshot path is not a regular file: " + path);
+            }
+            String content;
+            try (InputStream in = Files.newInputStream(path, LinkOption.NOFOLLOW_LINKS)) {
+                content = new String(in.readAllBytes(), StandardCharsets.UTF_8);
+            }
             return new Snapshot(name, content);
         } catch (NoSuchFileException e) {
             return null;
@@ -75,9 +85,6 @@ public final class SnapshotStore {
         Path targetPath = resolvePath(snapshot.name());
         Path tempFile = null;
         try {
-            if (Files.isSymbolicLink(targetPath)) {
-                Files.delete(targetPath);
-            }
             Set<PosixFilePermission> perms = PosixFilePermissions.fromString("rw-------");
             FileAttribute<Set<PosixFilePermission>> attr = PosixFilePermissions.asFileAttribute(perms);
             try {
@@ -112,18 +119,6 @@ public final class SnapshotStore {
             throw new SnapshotException("Snapshot name escapes snapshot directory: " + name);
         }
         return resolved;
-    }
-
-    private void verifySymlinkContainment(Path symlink) {
-        try {
-            Path realTarget = symlink.toRealPath();
-            Path realDir = Files.exists(snapshotDir) ? snapshotDir.toRealPath() : snapshotDir;
-            if (!realTarget.startsWith(realDir)) {
-                throw new SnapshotException("Symbolic link target escapes snapshot directory: " + symlink);
-            }
-        } catch (IOException e) {
-            throw new SnapshotException("Failed to verify symlink target: " + symlink, e);
-        }
     }
 
     private void ensureDirectoryExists() {

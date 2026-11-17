@@ -143,8 +143,11 @@ class SnapshotStoreTest {
             });
         }
 
-        assertTrue(latch.await(5, TimeUnit.SECONDS));
-        executor.shutdown();
+        try {
+            assertTrue(latch.await(5, TimeUnit.SECONDS));
+        } finally {
+            executor.shutdownNow();
+        }
         assertEquals(0, failures.get());
     }
 }
