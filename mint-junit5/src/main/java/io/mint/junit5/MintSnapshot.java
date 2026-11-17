@@ -39,6 +39,34 @@ public final class MintSnapshot {
     }
 
     /**
+     * Creates a new {@code MintSnapshot} configured with a specific snapshot name.
+     *
+     * <p>This allows multiple independent snapshots to be recorded and asserted
+     * within the same test method without naming collisions.
+     *
+     * @param snapshotName the custom snapshot name, must not be null or blank
+     * @return a new {@code MintSnapshot} instance with the specified snapshot name
+     * @throws NullPointerException if {@code snapshotName} is null
+     * @throws IllegalArgumentException if {@code snapshotName} is blank
+     */
+    public MintSnapshot named(String snapshotName) {
+        Objects.requireNonNull(snapshotName, "snapshotName must not be null");
+        if (snapshotName.isBlank()) {
+            throw new IllegalArgumentException("snapshotName must not be blank");
+        }
+        return new MintSnapshot(this.store, this.serializer, this.comparator, snapshotName);
+    }
+
+    /**
+     * Returns the snapshot name used by this instance.
+     *
+     * @return the snapshot name, never null
+     */
+    public String testName() {
+        return this.testName;
+    }
+
+    /**
      * Asserts that the actual object matches the stored snapshot for this test.
      *
      * <p>First-run write semantics: On the first test execution when no baseline snapshot file
